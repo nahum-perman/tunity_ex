@@ -13,17 +13,11 @@ type UDP_Server struct {
 }
 
 func main(){
-	argc := len(os.Args)
-	if argc != 3 {
-		PrintUsage()
-		os.Exit(-1)
-	}
+	portIn, portOut, err := GetPortsFromArgs()
 
-	portIn, portOut, err := GetPortsFromArgs(os.Args)
-
-	if err != nil{
+	if err != 0{
 		fmt.Println(err)
-		os.Exit(-2)
+		os.Exit(err)
 	}
 
 	fmt.Println(portIn, portOut)
@@ -32,23 +26,35 @@ func main(){
 	//server := UDP_Server{int(os.Args[1]), os.Args[2]}
 }
 
-func GetPortsFromArgs(args []string) (portIn int ,portOut int,err error){
-	fmt.Println(args)
+func GetPortsFromArgs() (portIn int ,portOut int,error int){
+	args := os.Args
 	portIn = 0
 	portOut = 0
-	portIn, err = strconv.Atoi(args[1])
+	if len(args) != 3 {
+		error = -1
+		return
+	}
+	error = -2
+	portIn, err := strconv.Atoi(args[1])
 	if err != nil {
 		fmt.Println("input port:",args[1],"is not a number")
+		fmt.Println(err)
 		return
 	}
 	portOut, err = strconv.Atoi(args[2])
 	if err != nil {
 		fmt.Println("output port:",args[2],"is not a number")
+		fmt.Println(err)
+		return
 	}
 
 	if portIn == portOut{
 		err = errors.New("input port and output port cannot be equal")
+		fmt.Println(err)
+		return
 	}
+	error = 0
+
 	return
 }
 
